@@ -1,40 +1,40 @@
 package database.repository;
 
-import database.model.Company;
+import database.model.User;
 import utils.ConnectionPool;
-
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Optional;
 
-public class CompanyRepository {
+public class UserRepository {
     private final ConnectionPool connectionPool;
 
     private final static String FIND_BY_ID_SQL = """
-            SELECT id, name
-            FROM company
+            SELECT id, username
+            FROM users
             WHERE id = ?
             """;
 
-    private CompanyRepository(ConnectionPool connectionPool) {
+    public UserRepository(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
 
-    public Optional<Company> findCompanyById(Integer id) throws SQLException {
+    public Optional<User> findUserById(Integer id) throws SQLException {
         try (PreparedStatement statement = connectionPool.getConnection().prepareStatement(FIND_BY_ID_SQL)) {
             statement.setInt(1, id);
             var result = statement.executeQuery();
-            Company company = null;
+            User user = null;
             if (result.next()) {
-                company = Company.builder()
+                user = User.builder()
                         .id(result.getInt("id"))
-                        .name(result.getString("name"))
+                        .username(result.getString("username"))
                         .build();
             }
-            return Optional.ofNullable(company);
+            return Optional.ofNullable(user);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+
 }
