@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:application.properties"/>
+
+    <bean id="driver" class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="${db.driver}"/>
+    </bean>
+
+    <bean id="pool1" name="connection" class="utils.ConnectionPool"
+          init-method="init"
+          destroy-method="destroy"
+          scope="singleton">       <!--по умолчанию-->
+        <constructor-arg index="0" name="url" type="java.lang.String" value="${db.url}"/>
+        <constructor-arg index="1" name="username" type="java.lang.String" value="${db.username}"/>
+        <constructor-arg index="2" name="poolSize" type="java.lang.Integer" value="${db.pool.size}"/>
+        <constructor-arg index="3" name="password" type="java.lang.String" value="${db.password}"/>
+    </bean>
+
+    <bean id="companyRepository" class="database.repository.CompanyRepository">
+        <constructor-arg ref="pool1"/>
+    </bean>
+
+    <bean id="userRepository" class="database.repository.UserRepository">
+        <constructor-arg ref="pool1"/>
+    </bean>
+    <bean id="companyService" class="service.CompanyService">
+        <constructor-arg ref="companyRepository"/>
+    </bean>
+
+    <bean id="userService" class="service.UserService">
+        <constructor-arg ref="userRepository"/>
+    </bean>
+</beans>
